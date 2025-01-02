@@ -28,8 +28,9 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-    var datalistprovider = Provider.of<DataListProvider>(context);
 
+    var datalistprovider = Provider.of<DataListProvider>(context);
+    datalistprovider.geteventNmaeList(context);
     if (datalistprovider.loadEventList.isEmpty) {
       datalistprovider.getAllEvents();
     }

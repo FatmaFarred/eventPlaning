@@ -1,6 +1,7 @@
 import 'package:event_planing/HomePage/Events%20widget.dart';
 import 'package:event_planing/HomePage/events%20model.dart';
 import 'package:event_planing/HomeScreen/custome_textfield.dart';
+import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/app%20colors.dart';
@@ -20,6 +21,9 @@ class FavoritePage extends StatelessWidget {
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
     var themeProvider = Provider.of<MyAppThemeProvier>(context);
+    var datalistprovider = Provider.of<DataListProvider>(context);
+    datalistprovider.getfilterFavoritelist();
+
 
     List<EventsClass>Eventlist=[EventsClass(Title: "this is birthday", ImageName: themeProvider.MyAppTheme==ThemeMode.light?Assets.birthday:Assets.birthdayDark, Day: "21", Month: "Nov",eventName: AppLocalizations.of(context)!.birthday),
       EventsClass(Title: "this is meeting", ImageName: themeProvider.MyAppTheme==ThemeMode.light?Assets.meeting:Assets.meetingDark, Day: "22", Month: "Nov",eventName:AppLocalizations.of(context)!.meeting),
@@ -35,8 +39,8 @@ class FavoritePage extends StatelessWidget {
 
     ];
 
-    return  Placeholder(
-     /* body: Column(
+    return  Scaffold(
+      body: Column(
         children: [
           SizedBox(height:height *0.07 ,),
           Padding(
@@ -44,17 +48,17 @@ class FavoritePage extends StatelessWidget {
             child: CustomeTextfield(color:AppColors.primaryColorLight,hintStyle: AppFontStyles.primarylight16medium,
               hintText:AppLocalizations.of(context)!.searchForEvent ,prefixIcon: Icon(Icons.search,size: size.width*0.08,),),
           ),
-          Expanded(child: ListView.builder(itemCount: Eventlist.length,
+          Expanded(child:datalistprovider.favoriteList.isEmpty?Center(child: Text("No favorite yet",style: AppFontStyles.primarylight24medium,)):
+          ListView.builder(itemCount: datalistprovider.favoriteList.length,
               padding: EdgeInsets.only(top: height*0.01),
               itemBuilder: (context,index) {
-                return EventWidget(Title: Eventlist[index].Title, ImageName: Eventlist[index].ImageName, Day: Eventlist[index].Day, Month:
-                Eventlist[index].Month,isSelected: true,);
+                return EventWidget(event: datalistprovider.favoriteList[index], isSelected: true,);
               }
           ))
 
 
         ],
-      ),*/
+      ),
 
 
 

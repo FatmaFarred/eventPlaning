@@ -1,10 +1,12 @@
 import 'package:event_planing/Firebase%20utilies/model%20class.dart';
+import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/app%20colors.dart';
 import 'package:event_planing/utilies/assets.dart';
 import 'package:event_planing/utilies/fonts.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class EventWidget  extends StatelessWidget {
@@ -15,6 +17,8 @@ Event event;
     required this.isSelected});
   @override
   Widget build(BuildContext context) {
+    var datalistprovider = Provider.of<DataListProvider>(context);
+
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
@@ -43,7 +47,7 @@ Event event;
 
       color: themeProvider.MyAppTheme==ThemeMode.light ?AppColors.cleanwhite:AppColors.primaryColorDark
           ),
-            child: Column(children: [Text("${event.Date?.day}",style: AppFontStyles.primarylight20Bold,),Text("${event.Date?.month}",style: AppFontStyles.primarylight20Bold)],),
+            child: Column(children: [Text("${event.Date?.day}",style: AppFontStyles.primarylight20Bold,),Text(DateFormat.MMM().format(event.Date!),style: AppFontStyles.primarylight20Bold)],),
 
           ),
 
@@ -60,7 +64,8 @@ Event event;
     ),
       child: Row(children: [Text(event.Title!,style:themeProvider.MyAppTheme==ThemeMode.light ?AppFontStyles.balck14Bold:AppFontStyles.White14Bold ,),
         Spacer(),
-        Image.asset(isSelected?Assets.selectedlike:Assets.like)],),
+        InkWell( onTap: (){datalistprovider.updateFavorite(event); },
+            child: Image.asset(event.IsFavorite==true?Assets.selectedlike:Assets.like))],),
     )
 
 

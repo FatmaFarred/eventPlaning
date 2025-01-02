@@ -25,6 +25,7 @@ class CustomeTextfield extends StatelessWidget {
  // String?Function (String?)? validatorFunction;
   MyvalidatorFunction validatorFunction;
   TextEditingController? controller;
+  TextInputType ? keyboardType;
 
   CustomeTextfield(
 
@@ -42,7 +43,8 @@ class CustomeTextfield extends StatelessWidget {
         this.sufixIconColor,
         this.cursorColor,
         this.validatorFunction,
-        this.controller
+        this.controller,
+        this.keyboardType
       });
 
   @override
@@ -52,13 +54,15 @@ class CustomeTextfield extends StatelessWidget {
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
     var themeProvider = Provider.of<MyAppThemeProvier>(context);
     return TextFormField(
+
       controller:controller ,
       validator: validatorFunction,
       obscureText: isobscured ?? false,
-
+       // keyboardType: keyboardType ??TextInputType.text ,
       cursorColor: cursorColor ?? (themeProvider.MyAppTheme==ThemeMode.light?AppColors.grey :AppColors.primaryColorLight),
       style: style ?? AppFontStyles.balck16medium,
       decoration: InputDecoration(
+
         errorBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(color: Colors.red)),
@@ -84,7 +88,7 @@ class CustomeTextfield extends StatelessWidget {
 
 
       ),
-      maxLines: maxLines,
+      maxLines: maxLines??1,
     );
   }
 }
