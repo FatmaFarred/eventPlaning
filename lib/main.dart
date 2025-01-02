@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_planing/HomePage/HomePage.dart';
 import 'package:event_planing/HomePage/addevent.dart';
 import 'package:event_planing/HomeScreen/homescreen.dart';
@@ -6,6 +7,7 @@ import 'package:event_planing/authentication/forget%20password.dart';
 import 'package:event_planing/authentication/register.dart';
 import 'package:event_planing/firebase_options.dart';
 import 'package:event_planing/profile%20page/profile page.dart';
+import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/MyTheme.dart';
@@ -19,8 +21,12 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await FirebaseFirestore.instance.disableNetwork();
 
-  runApp(  MultiProvider( providers: [ChangeNotifierProvider(create: (context)=>MyAppThemeProvier()),ChangeNotifierProvider(create: (context)=>MyAppLanguageProvider())],
+  runApp(  MultiProvider( providers: [ChangeNotifierProvider(create: (context)=>MyAppThemeProvier()),ChangeNotifierProvider(create: (context)=>MyAppLanguageProvider()),
+    ChangeNotifierProvider(create: (context)=>DataListProvider())
+
+  ],
       child: MyApp()));
 
 }

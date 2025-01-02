@@ -1,3 +1,4 @@
+import 'package:event_planing/Firebase%20utilies/model%20class.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/app%20colors.dart';
@@ -7,13 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class EventWidget  extends StatelessWidget {
-  String ImageName ;
-  String Title;
-  String Day;
-  String Month;
-  bool isSelected;
 
- EventWidget ({required this.Title , required this.ImageName, required this.Day , required this.Month, required this.isSelected});
+  bool isSelected;
+Event event;
+ EventWidget ({ required this.event,
+    required this.isSelected});
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -25,7 +24,7 @@ class EventWidget  extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: width*0.04,vertical: height*0.008),
       margin:EdgeInsets.symmetric(horizontal: width*0.04,vertical: height*0.01) ,
     decoration: BoxDecoration(
-    image: DecorationImage(image: AssetImage(ImageName),fit: BoxFit.fill),
+    image: DecorationImage(image: AssetImage(event.Image!),fit: BoxFit.fill),
     borderRadius: BorderRadius.circular(16),
       border: Border.all(color: AppColors.primaryColorLight,width: 3),
 
@@ -44,7 +43,7 @@ class EventWidget  extends StatelessWidget {
 
       color: themeProvider.MyAppTheme==ThemeMode.light ?AppColors.cleanwhite:AppColors.primaryColorDark
           ),
-            child: Column(children: [Text(Day,style: AppFontStyles.primarylight20Bold,),Text(Month,style: AppFontStyles.primarylight20Bold)],),
+            child: Column(children: [Text("${event.Date?.day}",style: AppFontStyles.primarylight20Bold,),Text("${event.Date?.month}",style: AppFontStyles.primarylight20Bold)],),
 
           ),
 
@@ -59,7 +58,7 @@ class EventWidget  extends StatelessWidget {
 
 
     ),
-      child: Row(children: [Text(Title,style:themeProvider.MyAppTheme==ThemeMode.light ?AppFontStyles.balck14Bold:AppFontStyles.White14Bold ,),
+      child: Row(children: [Text(event.Title!,style:themeProvider.MyAppTheme==ThemeMode.light ?AppFontStyles.balck14Bold:AppFontStyles.White14Bold ,),
         Spacer(),
         Image.asset(isSelected?Assets.selectedlike:Assets.like)],),
     )

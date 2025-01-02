@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class TabWidget extends StatelessWidget {
-  bool IsSelected;
+  bool  IsSelected ;
   String tabName;
   Color ? bordercolor;
   Color ? color;

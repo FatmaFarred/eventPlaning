@@ -1,6 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:event_planing/Firebase%20utilies/firebase%20utilies.dart';
+import 'package:event_planing/Firebase%20utilies/model%20class.dart';
 import 'package:event_planing/HomePage/Events%20widget.dart';
 import 'package:event_planing/HomePage/events%20model.dart';
 import 'package:event_planing/HomePage/tab%20widget.dart';
+import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/app%20colors.dart';
@@ -22,12 +26,14 @@ class _HomepageState extends State<Homepage> {
 
 
 
-
   @override
   Widget build(BuildContext context) {
-    List <String> tabslist=['All',AppLocalizations.of(context)!.sport,AppLocalizations.of(context)!.holiday,AppLocalizations.of(context)!.meeting,AppLocalizations.of(context)!.bookClub,AppLocalizations.of(context)!.workshop,AppLocalizations.of(context)!.exhibition,AppLocalizations.of(context)!.eating,AppLocalizations.of(context)!.gaming,AppLocalizations.of(context)!.birthday];
+    var datalistprovider = Provider.of<DataListProvider>(context);
 
-    int SelectedIndex=0;
+    if (datalistprovider.loadEventList.isEmpty) {
+      datalistprovider.getAllEvents();
+    }
+
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
@@ -45,6 +51,8 @@ class _HomepageState extends State<Homepage> {
 
 
     ];
+    int chosenindex=0;
+
 
 
     return Scaffold(
@@ -85,19 +93,17 @@ class _HomepageState extends State<Homepage> {
                       margin: EdgeInsets.symmetric(horizontal: width * 0.02),
 
 
+
                     )
                   ],
                 ),
                 Row(children: [Image.asset(Assets.mapPin),SizedBox(width: width*0.02,),Text("Cairo ,Egypt",style: AppFontStyles.White14medium,)],),
                 DefaultTabController(
 
-                    length: tabslist.length,
+                    length: datalistprovider.eventnamelist.length,
                     child: TabBar(isScrollable: true,
                         onTap: (index){
-
-                      setState(() {
-                        SelectedIndex=index;
-                      });
+                          datalistprovider.changeSelectedIndex(index);
                         },
 
                         padding: EdgeInsets.symmetric(vertical: height*0.015 ),
@@ -105,8 +111,19 @@ class _HomepageState extends State<Homepage> {
                         tabAlignment: TabAlignment.start,
                         labelPadding: EdgeInsets.symmetric(horizontal: width*0.01),
 
-                        tabs: tabslist.map((tabName){
-                      return TabWidget(tabName: tabName, IsSelected: SelectedIndex==tabslist.indexOf(tabName));
+                        tabs: datalistprovider.eventnamelist.map((tabName){
+
+                      return TabWidget(tabName: tabName, IsSelected: Eventlist == datalistprovider.eventnamelist.indexOf(tabName),
+                        textstyle: datalistprovider.SelectedIndex == datalistprovider.eventnamelist.indexOf(tabName)
+                            ? AppFontStyles.primarylight16medium
+                            : AppFontStyles.White16medium,
+                        color: datalistprovider.SelectedIndex == datalistprovider.eventnamelist.indexOf(tabName)
+                            ? AppColors.cleanwhite
+                            : Colors.transparent,
+                      );
+
+
+
 
                     }).toList()
                 )
@@ -115,15 +132,18 @@ class _HomepageState extends State<Homepage> {
 
     ])
     ),
-          Expanded(child: ListView.builder(itemCount: Eventlist.length,
+          Expanded(child:datalistprovider.filterList.isEmpty?Text("No event to show"):
+          ListView.builder(itemCount:datalistprovider.filterList.length,
               padding: EdgeInsets.only(top: height*0.01),
               itemBuilder: (context,index) {
-                return EventWidget(Title: Eventlist[index].Title, ImageName: Eventlist[index].ImageName, Day: Eventlist[index].Day, Month:
-                Eventlist[index].Month,isSelected: true,);
+                return EventWidget(event :datalistprovider.filterList[index],
+                isSelected: true,);
               }
           ))
 
         ] )
     );
   }
-}
+
+  }
+
