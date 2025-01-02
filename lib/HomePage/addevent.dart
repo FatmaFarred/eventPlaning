@@ -1,8 +1,11 @@
+import 'package:event_planing/Firebase%20utilies/firebase%20utilies.dart';
+import 'package:event_planing/Firebase%20utilies/model%20class.dart';
 import 'package:event_planing/HomePage/HomePage.dart';
 import 'package:event_planing/HomePage/events%20model.dart';
 import 'package:event_planing/HomePage/tab%20widget.dart';
 import 'package:event_planing/HomeScreen/Elevatedbottom.dart';
 import 'package:event_planing/HomeScreen/custome_textfield.dart';
+import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/app%20colors.dart';
@@ -10,6 +13,7 @@ import 'package:event_planing/utilies/assets.dart';
 import 'package:event_planing/utilies/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -25,24 +29,31 @@ class _AddeventPageState extends State<AddeventPage> {
   var enteredDescription = TextEditingController();
   String SelectedImage ='';
   String SelectedName = '';
+  int SelectedIndex=0;
 
-  int selectedindex = 0;
+ late DataListProvider datalistprovider;
   var formKey = GlobalKey<FormState>();
   var Chosendate;
 DateTime ? Selcetdday;
-  var formatedday;
+  String formatedday ='';
   TimeOfDay ? chosentime;
   String erorrDate ='';
   String erorrTime ='';
+  String FormatedTime='';
 
   @override
   Widget build(BuildContext context) {
+
+    var datalistprovider=Provider.of<DataListProvider>(context);
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
     var themeProvider = Provider.of<MyAppThemeProvier>(context);
     List<EventsClass> Eventlist = [
-      EventsClass(
+
+
+    EventsClass(
+
           Title: "this is birthday",
           ImageName: themeProvider.MyAppTheme == ThemeMode.light
               ? Assets.birthday
@@ -135,7 +146,7 @@ DateTime ? Selcetdday;
                   clipBehavior: Clip.antiAlias,
                   decoration:
                       BoxDecoration(borderRadius: BorderRadius.circular(16)),
-                  child: Image.asset(Eventlist[selectedindex].ImageName)),
+                  child: Image.asset(Eventlist[SelectedIndex].ImageName)),
               Container(
                 margin: EdgeInsets.symmetric(vertical: height * 0.01),
                 height: height * 0.05,
@@ -145,23 +156,24 @@ DateTime ? Selcetdday;
                     itemBuilder: (context, index) {
                       return GestureDetector(
                         onTap: () {
+                          //dataprovider.changeselctedindex(index);
                           setState(() {
-                            selectedindex = index;
-                            SelectedImage=Eventlist[selectedindex].ImageName;
-                            SelectedName=Eventlist[selectedindex].eventName;
+                           SelectedIndex=index;
+                            SelectedImage=Eventlist[SelectedIndex].ImageName;
+                            SelectedName=Eventlist[SelectedIndex].eventName;
 
 
                             /// Update selected index
                           });
                         },
                         child: TabWidget(
-                            tabName: Eventlist[index].eventName,
-                            IsSelected: selectedindex == index,
+                            tabName:Eventlist[index].eventName ,
+                            IsSelected: SelectedIndex == index,
                             bordercolor: AppColors.primaryColorLight,
-                            color: selectedindex == index
+                            color:SelectedIndex == index
                                 ? AppColors.primaryColorLight
                                 : Colors.transparent,
-                            textstyle: selectedindex == index
+                            textstyle: SelectedIndex == index
                                 ? AppFontStyles.White16Bold
                                 : AppFontStyles.primarylight14Bold
                                     .copyWith(fontSize: 16)),
@@ -271,7 +283,9 @@ DateTime ? Selcetdday;
                           TextButton(
                               onPressed: chosetimeonpressed,
                               child: Text(chosentime==null?
-                                AppLocalizations.of(context)!.choosetime:"${chosentime!.hour}:${chosentime!.minute}",
+                                AppLocalizations.of(context)!.choosetime:FormatedTime,
+                              //"${chosentime!.hour}:${chosentime!.minute}",
+
                                 style: AppFontStyles.primarylight16medium,
                               ))
                         ],
@@ -329,10 +343,24 @@ DateTime ? Selcetdday;
 
   void addEventOnpressed() {
     if (formKey.currentState?.validate() == true) {
-      if (formatedday != null && chosentime != null) {
-        Navigator.of(context).pushNamed(Homepage.routeName);
+      if (Chosendate != null && chosentime != null) {
+        Event event =Event(Title: enteredtitle.text, Description: enteredDescription.text, Image: SelectedImage, Date: Chosendate, Time: FormatedTime, EventName:SelectedName );
+        FireBaseUtilies.Addeventtofirestore(event).timeout(Duration(milliseconds: 500),onTimeout: () {
+          print("the event added successfully");
+          Fluttertoast.showToast(msg: "the event added successfully",
+              fontSize: 16,
+              textColor: AppColors.cleanwhite,
+              backgroundColor: AppColors.primaryColorLight,
+              timeInSecForIosWeb: 1,
+              gravity: ToastGravity.CENTER);
+          datalistprovider.getAllEvents();
+
+        });
+
+        Navigator.of(context).pop(context);
+
       } else {
-        formatedday == null ? erorrDate = "*required" : erorrDate = " ";
+        Chosendate == null ? erorrDate = "*required" : erorrDate = " ";
         chosentime == null ? erorrTime = "*required" : erorrTime = " ";
       }
 
@@ -345,7 +373,7 @@ DateTime ? Selcetdday;
 
   void onpressedeventdate() async{
     Chosendate=await showDatePicker(
-      errorInvalidText:"CANT BE NULL" ,
+
         context: context,
         firstDate: DateTime.now(),
         lastDate: DateTime.now().add(Duration(days: 365)));
@@ -363,6 +391,8 @@ DateTime ? Selcetdday;
         initialTime: TimeOfDay.now(),
 
     );
+     FormatedTime = chosentime!.format(context);
+     
      setState(() {
 
      });

@@ -35,8 +35,8 @@ class FavoritePage extends StatelessWidget {
 
     ];
 
-    return  Scaffold(
-      body: Column(
+    return  Placeholder(
+     /* body: Column(
         children: [
           SizedBox(height:height *0.07 ,),
           Padding(
@@ -54,7 +54,7 @@ class FavoritePage extends StatelessWidget {
 
 
         ],
-      ),
+      ),*/
 
 
 
