@@ -37,9 +37,9 @@ class DataListProvider extends ChangeNotifier {
     ];
   }
 
-  void getAllEvents() async {
+  void getAllEvents(String uid) async {
     QuerySnapshot<Event> querySnapshot =
-        await FireBaseUtilies.createCollection().get();
+        await FireBaseUtilies.createCollection(uid).get();
     loadEventList = querySnapshot.docs.map((doc) {
       return doc.data();
     }).toList();
@@ -49,9 +49,9 @@ class DataListProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getfilterEvents() async {
+  void getfilterEvents(String uid) async {
     QuerySnapshot<Event> querySnapshot =
-        await FireBaseUtilies.createCollection().orderBy("Date").get();
+        await FireBaseUtilies.createCollection(uid).orderBy("Date").get();
     loadEventList = querySnapshot.docs.map((doc) {
       return doc.data();
     }).toList();
@@ -62,30 +62,31 @@ class DataListProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeSelectedIndex(int newindex) {
+  void changeSelectedIndex(int newindex,String uid) {
     SelectedIndex = newindex;
     if (SelectedIndex == 0) {
-      getAllEvents();
+      getAllEvents(uid);
     } else {
-      getfilterEvents();
+      getfilterEvents(uid);
     }
   }
 
-  void updateFavorite(Event event) {
-    FireBaseUtilies.createCollection()
+  void updateFavorite(Event event,String uid) {
+    FireBaseUtilies.createCollection(uid)
         .doc(event.id)
         .update({"IsFavorite": !event.IsFavorite!}).timeout(
-            Duration(milliseconds: 500),onTimeout: (){
+            Duration(milliseconds: 200),onTimeout: (){
               print ("event updated successfully");
-               SelectedIndex==0?getAllEvents():getfilterEvents();
+               SelectedIndex==0?getAllEvents(uid):getfilterEvents(uid);
+               getfilterFavoritelist(uid);
               notifyListeners();
 
     });
   }
 
 
-  void getfilterFavoritelist ()async{
-    QuerySnapshot<Event> querySnapshot=await FireBaseUtilies.createCollection().orderBy("Date").get();
+  void getfilterFavoritelist (String uid)async{
+    QuerySnapshot<Event> querySnapshot=await FireBaseUtilies.createCollection(uid).orderBy("Date").get();
     loadEventList = querySnapshot.docs.map((doc)=>doc.data()).toList() ;
     favoriteList=loadEventList.where((event){
       return event.IsFavorite==true;

@@ -1,4 +1,5 @@
 import 'package:event_planing/Firebase%20utilies/model%20class.dart';
+import 'package:event_planing/provider/UserProvider.dart';
 import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
@@ -17,6 +18,7 @@ Event event;
     required this.isSelected});
   @override
   Widget build(BuildContext context) {
+    var userProvide= Provider.of<UserProvider>(context);
     var datalistprovider = Provider.of<DataListProvider>(context);
 
     var height = MediaQuery.of(context).size.height;
@@ -64,9 +66,11 @@ Event event;
     ),
       child: Row(children: [Text(event.Title!,style:themeProvider.MyAppTheme==ThemeMode.light ?AppFontStyles.balck14Bold:AppFontStyles.White14Bold ,),
         Spacer(),
-        InkWell( onTap: (){datalistprovider.updateFavorite(event); },
+        InkWell( onTap: (){datalistprovider.updateFavorite(event,userProvide.currentuser!.Id); },
             child: Image.asset(event.IsFavorite==true?Assets.selectedlike:Assets.like))],),
     )
+
+
 
 
 

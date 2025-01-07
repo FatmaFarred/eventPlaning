@@ -5,6 +5,7 @@ import 'package:event_planing/HomePage/events%20model.dart';
 import 'package:event_planing/HomePage/tab%20widget.dart';
 import 'package:event_planing/HomeScreen/Elevatedbottom.dart';
 import 'package:event_planing/HomeScreen/custome_textfield.dart';
+import 'package:event_planing/provider/UserProvider.dart';
 import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
@@ -341,22 +342,40 @@ DateTime ? Selcetdday;
     );
   }
 
+
   void addEventOnpressed() {
+    var userProvide= Provider.of<UserProvider>(context,listen: false);
     if (formKey.currentState?.validate() == true) {
       if (Chosendate != null && chosentime != null) {
         Event event =Event(Title: enteredtitle.text, Description: enteredDescription.text, Image: SelectedImage, Date: Chosendate, Time: FormatedTime, EventName:SelectedName );
-        FireBaseUtilies.Addeventtofirestore(event).timeout(Duration(milliseconds: 500),onTimeout: () {
+        FireBaseUtilies.Addeventtofirestore(event,userProvide.currentuser!.Id).then((value){
           print("the event added successfully");
+          datalistprovider.changeSelectedIndex(0,userProvide.currentuser!.Id);
+
           Fluttertoast.showToast(msg: "the event added successfully",
+
               fontSize: 16,
               textColor: AppColors.cleanwhite,
               backgroundColor: AppColors.primaryColorLight,
               timeInSecForIosWeb: 1,
               gravity: ToastGravity.CENTER);
-          datalistprovider.getAllEvents();
 
         });
-
+        //
+        //
+        //     .timeout(Duration(milliseconds: 500),onTimeout: () {
+        //   print("the event added successfully");
+        //   datalistprovider.changeSelectedIndex(0);
+        //
+        //   Fluttertoast.showToast(msg: "the event added successfully",
+        //
+        //       fontSize: 16,
+        //       textColor: AppColors.cleanwhite,
+        //       backgroundColor: AppColors.primaryColorLight,
+        //       timeInSecForIosWeb: 1,
+        //       gravity: ToastGravity.CENTER);
+        //
+        // });
         Navigator.of(context).pop(context);
 
       } else {
