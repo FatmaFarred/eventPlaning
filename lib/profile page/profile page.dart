@@ -101,6 +101,7 @@ class _HomeScreenState extends State<profilePage> {
             { //NAVIGATION
 
               datalistprovider.filterList=[];
+              datalistprovider.changeSelectedIndex(0, userProvide.currentuser!.Id);
               Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
               },
                 child: Row(children: [Image.asset(Assets.logout),

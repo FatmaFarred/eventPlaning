@@ -27,6 +27,8 @@ class AppFontStyles {
   static TextStyle White14Bold =GoogleFonts.inter(color: AppColors.cleanwhite, fontWeight: FontWeight.bold,fontSize: 14);
   static TextStyle White16Bold =GoogleFonts.inter(color: AppColors.cleanwhite, fontWeight: FontWeight.bold,fontSize: 16);
   static TextStyle red =GoogleFonts.inter(color: Colors.red, fontWeight: FontWeight.w200,fontSize: 14);
+  static TextStyle primarylight22Regular =GoogleFonts.roboto(color: AppColors.primaryColorLight, fontWeight: FontWeight.w200,fontSize: 22);
+  //static //TextStyle primarylight20medium =GoogleFonts.roboto(color: AppColors.primaryColorLight, fontWeight: FontWeight.w500,fontSize: 20);
 
 
 

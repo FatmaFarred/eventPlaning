@@ -37,6 +37,7 @@ class FireBaseUtilies {      //create collection and name it
     }
 
 
+  }
 
 
 
@@ -44,4 +45,4 @@ class FireBaseUtilies {      //create collection and name it
 
 
 
-}
+

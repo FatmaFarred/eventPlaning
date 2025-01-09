@@ -43,5 +43,8 @@
   "chooselocation": "اختر عنوان الحدث ",
   "addevent": "اضافة حدث",
   "choosedate": "اختر التاريخ ",
-  "choosetime": "اختر الوقت "
+  "choosetime": "اختر الوقت ",
+  "eventdetails": "تفاصيل الحدث",
+    "updateevent": "تحديث"
+
 }

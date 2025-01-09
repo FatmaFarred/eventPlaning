@@ -43,5 +43,9 @@
   "chooselocation": "Choose Event Location ",
   "addevent": "Add Event",
   "choosedate": "Choose Date",
-  "choosetime": "Choose Time"
+  "choosetime": "Choose Time",
+    "eventdetails":"Event Details",
+        "updateevent": "Update Event"
+
+
 }

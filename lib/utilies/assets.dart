@@ -61,6 +61,10 @@ class Assets {
   static const String clockdark ="assets/images/clock dark.png";
   static const String delete ="assets/images/delete.png";
   static const String edit ="assets/images/edit.png";
+  static const String calendercontainer ="assets/images/calendercontainer.png";
+  static const String calendercontainerDark ="assets/images/calendercontainer dark.png";
+  static const String locationcontainerDark ="assets/images/location container dark.png";
+  static const String MAP ="assets/images/map.png";
 
 
 

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:event_planing/HomePage/HomePage.dart';
 import 'package:event_planing/HomePage/addevent.dart';
+import 'package:event_planing/HomePage/event%20details.dart';
+import 'package:event_planing/HomePage/updateevent.dart';
 import 'package:event_planing/HomeScreen/homescreen.dart';
 import 'package:event_planing/authentication/Authentication.dart';
 import 'package:event_planing/authentication/forget%20password.dart';
@@ -53,7 +55,8 @@ class MyApp extends StatelessWidget {
        Register.routeName:(context)=>Register(),
        ForgetpasswordPage.routeName:(context)=>ForgetpasswordPage(),
        AddeventPage.routeName:(context)=>AddeventPage(),
-
+       EventDetails.RouteName:(context)=>EventDetails(),
+       UpdateEvent.routeName:(context)=>UpdateEvent(),
      } ,
      debugShowCheckedModeBanner: false,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
