@@ -1,4 +1,5 @@
 import 'package:event_planing/Firebase%20utilies/firebase%20utilies.dart';
+import 'package:event_planing/Firebase%20utilies/user%20model%20class.dart';
 import 'package:event_planing/HomePage/HomePage.dart';
 import 'package:event_planing/HomeScreen/CustomAlertDialogue.dart';
 import 'package:event_planing/HomeScreen/Elevatedbottom.dart';
@@ -16,6 +17,7 @@ import 'package:event_planing/utilies/fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -147,6 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],),
                 SizedBox(height: height * 0.02,),
                 CustomeElevatedButtom(
+                  onpressed: signInWithGoogle,
                   style: AppFontStyles.primarylight20medium,
                   color: Colors.transparent,
                   IconImage: Image.asset(Assets.google),
@@ -212,5 +215,87 @@ class _LoginScreenState extends State<LoginScreen> {
 
   }
 }
+  Future<void> signInWithGoogle() async {
+    CustomAlertDialogue.showLoading(context: context, message: "Loading...");
+
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        // If Google sign-in is canceled
+        CustomAlertDialogue.hideLoading(context: context);
+        CustomAlertDialogue.showMessage(
+            context: context,
+            message: "Google Sign-In was canceled.");
+        return;
+      }
+
+      // Obtain the authentication details from the Google sign-in
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create a new credential using the access and ID token
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in with Firebase using the created credentials
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      String? uid = userCredential.user?.uid;
+      print("Signed in UID: $uid");
+      MyUser? myUser = MyUser(Id: uid ?? "", name: userCredential.user?.displayName ?? "", email: userCredential.user?.email??"");
+
+      if (userCredential.additionalUserInfo!.isNewUser){
+        await FireBaseUtilies.addUser(myUser);
+
+      }
+      // Check the user credential and UID
+
+
+
+      // Now fetch the user from Firestore using the UID
+       myUser = await FireBaseUtilies.readUserFromFireStore(uid ?? "");
+
+      // Debugging: Check if the user exists in Firestore
+      if (myUser == null) {
+        print("User not found in Firestore, creating a new one...");
+
+      }
+
+      // Check if the user is null even after creating
+      if (myUser == null) {
+        CustomAlertDialogue.hideLoading(context: context);
+        CustomAlertDialogue.showMessage(
+            context: context,
+            message: "Failed to fetch or create user.");
+        return;
+      }
+
+      // Update the user provider with the user data
+      var userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.changeUser(myUser);
+
+      // Fetch data and navigate to the homescreen
+      var dataListProvider = Provider.of<DataListProvider>(context, listen: false);
+      dataListProvider.getAllEvents(userProvider.currentuser!.Id);
+
+      // Hide the loading indicator and show a success message
+      CustomAlertDialogue.hideLoading(context: context);
+      CustomAlertDialogue.showMessage(
+          context: context,
+          message: "Login successful");
+
+      // Navigate to the homescreen
+      Navigator.of(context).pushReplacementNamed(Homescreen.routeName);
+
+    } catch (e) {
+      // Handle any errors that occur during sign-in
+      CustomAlertDialogue.hideLoading(context: context);
+      CustomAlertDialogue.showMessage(context: context, message: e.toString());
+      print("Error during Google Sign-In: $e");
+      return Future.error(e);
+    }
+  }
+
 
 }

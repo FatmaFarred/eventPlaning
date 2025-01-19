@@ -84,7 +84,7 @@ class _HomepageState extends State<Homepage> {
                           AppLocalizations.of(context)!.welcomeBack,
                           style: AppFontStyles.White14Regular,
                         ),
-                        Text(userProvide.currentuser!.name, style: AppFontStyles.White24Bold)
+                        Text(userProvide.currentuser?.name??"", style: AppFontStyles.White24Bold)
                       ],
                     ),
                     Spacer(),

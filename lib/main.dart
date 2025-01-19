@@ -66,7 +66,6 @@ class MyApp extends StatelessWidget {
       darkTheme:MyAppTheme.darkTheme ,
       themeMode:themeProvider.MyAppTheme ,
 
-
     );
   }
 }

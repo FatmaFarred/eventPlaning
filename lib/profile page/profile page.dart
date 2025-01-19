@@ -40,7 +40,7 @@ class _HomeScreenState extends State<profilePage> {
          child: Row(children: [Image.asset(Assets.route),
            SizedBox(width: width*0.02),
            Column(mainAxisAlignment: MainAxisAlignment.center,
-             children: [Text(userProvide.currentuser!.name,style: AppFontStyles.white20Bold,),Text(userProvide.currentuser!.email,style: AppFontStyles.White14medium)],
+             children: [Text(userProvide.currentuser?.name??"",style: AppFontStyles.white20Bold,),Text(userProvide.currentuser?.email??"",style: AppFontStyles.White14medium)],
            )
          
          ],),
