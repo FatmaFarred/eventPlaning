@@ -29,7 +29,7 @@ class Event {
     EventName:dataMap["EventName"] ,
     Date: DateTime.fromMillisecondsSinceEpoch(dataMap["Date"]),
     Image: dataMap["Image"],
-    Time: dataMap["Image"],
+    Time: dataMap["Time"],
     IsFavorite: dataMap["IsFavorite"]
   );
 

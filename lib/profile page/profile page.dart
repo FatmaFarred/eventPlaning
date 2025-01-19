@@ -1,5 +1,8 @@
+import 'package:event_planing/authentication/Authentication.dart';
 import 'package:event_planing/profile%20page/drop%20dowm%20them%20bottom%20sheet.dart';
 import 'package:event_planing/profile%20page/drop%20down%20sheet%20bottom.dart';
+import 'package:event_planing/provider/UserProvider.dart';
+import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/app%20colors.dart';
@@ -21,8 +24,11 @@ class profilePage extends StatefulWidget {
 class _HomeScreenState extends State<profilePage> {
   @override
   Widget build(BuildContext context) {
+    var datalistprovider = Provider.of<DataListProvider>(context);
+
     var languageProvider  =Provider.of<MyAppLanguageProvider>(context);
     var themeProvider = Provider.of<MyAppThemeProvier>(context);
+    var userProvide = Provider.of<UserProvider>(context);
 
 
     var height = MediaQuery.of(context).size.height;
@@ -30,10 +36,11 @@ class _HomeScreenState extends State<profilePage> {
     return  Scaffold(
 
      appBar:AppBar(toolbarHeight: height*0.18,shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(65))),
-       title: Container(margin:EdgeInsets.all(6) ,
+       leading: Container( margin: EdgeInsets.symmetric(vertical: height*0.01, horizontal: width*0.04),
          child: Row(children: [Image.asset(Assets.route),
-           SizedBox(width: width*0.03),
-           Column(children: [Text("user name",style: AppFontStyles.white20Bold,),Text("user e_mail",style: AppFontStyles.White16medium)],
+           SizedBox(width: width*0.02),
+           Column(mainAxisAlignment: MainAxisAlignment.center,
+             children: [Text(userProvide.currentuser?.name??"",style: AppFontStyles.white20Bold,),Text(userProvide.currentuser?.email??"",style: AppFontStyles.White14medium)],
            )
          
          ],),
@@ -50,7 +57,7 @@ class _HomeScreenState extends State<profilePage> {
           Dropdownsheet();
         },
           child: Container(padding: EdgeInsets.symmetric(horizontal: width*0.04,vertical:height*0.02),
-            margin: EdgeInsets.symmetric(horizontal: width*0.04,vertical:height*0.01),
+            margin: EdgeInsets.symmetric(horizontal: width*0.01,vertical:height*0.01),
             child:Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [ languageProvider.MyAppLanguage=='en' ?Text(AppLocalizations.of(context)!.english,style: AppFontStyles.primarylight20Bold):Text(AppLocalizations.of(context)!.arabic,style: AppFontStyles.primarylight20Bold,),
 
@@ -92,6 +99,10 @@ class _HomeScreenState extends State<profilePage> {
                style: ElevatedButton.styleFrom(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),backgroundColor: AppColors.orange),
                 onPressed: ()
             { //NAVIGATION
+
+              datalistprovider.filterList=[];
+              datalistprovider.changeSelectedIndex(0, userProvide.currentuser!.Id);
+              Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
               },
                 child: Row(children: [Image.asset(Assets.logout),
                 SizedBox(width: width*0.02,),

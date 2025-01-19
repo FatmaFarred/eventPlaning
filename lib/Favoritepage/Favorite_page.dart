@@ -1,6 +1,7 @@
 import 'package:event_planing/HomePage/Events%20widget.dart';
 import 'package:event_planing/HomePage/events%20model.dart';
 import 'package:event_planing/HomeScreen/custome_textfield.dart';
+import 'package:event_planing/provider/UserProvider.dart';
 import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
@@ -22,7 +23,9 @@ class FavoritePage extends StatelessWidget {
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
     var themeProvider = Provider.of<MyAppThemeProvier>(context);
     var datalistprovider = Provider.of<DataListProvider>(context);
-    datalistprovider.getfilterFavoritelist();
+    var userProvide= Provider.of<UserProvider>(context);
+
+    datalistprovider.getfilterFavoritelist(userProvide.currentuser!.Id);
 
 
     List<EventsClass>Eventlist=[EventsClass(Title: "this is birthday", ImageName: themeProvider.MyAppTheme==ThemeMode.light?Assets.birthday:Assets.birthdayDark, Day: "21", Month: "Nov",eventName: AppLocalizations.of(context)!.birthday),

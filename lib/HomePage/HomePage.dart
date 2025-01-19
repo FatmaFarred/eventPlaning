@@ -4,6 +4,7 @@ import 'package:event_planing/Firebase%20utilies/model%20class.dart';
 import 'package:event_planing/HomePage/Events%20widget.dart';
 import 'package:event_planing/HomePage/events%20model.dart';
 import 'package:event_planing/HomePage/tab%20widget.dart';
+import 'package:event_planing/provider/UserProvider.dart';
 import 'package:event_planing/provider/datalistprovider.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
@@ -28,16 +29,19 @@ class _HomepageState extends State<Homepage> {
 
   @override
   Widget build(BuildContext context) {
-
+    var userProvide= Provider.of<UserProvider>(context);
     var datalistprovider = Provider.of<DataListProvider>(context);
     datalistprovider.geteventNmaeList(context);
     if (datalistprovider.loadEventList.isEmpty) {
-      datalistprovider.getAllEvents();
+      datalistprovider.getAllEvents(userProvide.currentuser!.Id);
     }
+    //datalistprovider.getAllEvents();
+    print ("updated");
 
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
+
     var themeProvider = Provider.of<MyAppThemeProvier>(context);
     List<EventsClass>Eventlist=[EventsClass(Title: "this is birthday", ImageName: themeProvider.MyAppTheme==ThemeMode.light?Assets.birthday:Assets.birthdayDark, Day: "21", Month: "Nov",eventName: AppLocalizations.of(context)!.birthday),
       EventsClass(Title: "this is meeting", ImageName: themeProvider.MyAppTheme==ThemeMode.light?Assets.meeting:Assets.meetingDark, Day: "22", Month: "Nov",eventName:AppLocalizations.of(context)!.meeting),
@@ -80,7 +84,7 @@ class _HomepageState extends State<Homepage> {
                           AppLocalizations.of(context)!.welcomeBack,
                           style: AppFontStyles.White14Regular,
                         ),
-                        Text("User Name", style: AppFontStyles.White24Bold)
+                        Text(userProvide.currentuser?.name??"", style: AppFontStyles.White24Bold)
                       ],
                     ),
                     Spacer(),
@@ -104,7 +108,7 @@ class _HomepageState extends State<Homepage> {
                     length: datalistprovider.eventnamelist.length,
                     child: TabBar(isScrollable: true,
                         onTap: (index){
-                          datalistprovider.changeSelectedIndex(index);
+                          datalistprovider.changeSelectedIndex(index,userProvide.currentuser!.Id);
                         },
 
                         padding: EdgeInsets.symmetric(vertical: height*0.015 ),

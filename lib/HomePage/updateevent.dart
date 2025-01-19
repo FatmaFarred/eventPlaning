@@ -18,34 +18,53 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class AddeventPage extends StatefulWidget {
-  static String routeName = "Addevent";
+class UpdateEvent extends StatefulWidget {
+  static String routeName = "UpdateEvent";
 
   @override
-  State<AddeventPage> createState() => _AddeventPageState();
+  State<UpdateEvent> createState() => _UpdateEventState();
 }
 
-class _AddeventPageState extends State<AddeventPage> {
+class _UpdateEventState extends State<UpdateEvent> {
+  late Event event1;
   var enteredtitle = TextEditingController();
   var enteredDescription = TextEditingController();
   String SelectedImage ='';
   String SelectedName = '';
   int SelectedIndex=0;
 
- late DataListProvider datalistprovider;
+  late DataListProvider datalistprovider;
   var formKey = GlobalKey<FormState>();
   var Chosendate;
-DateTime ? Selcetdday;
+  DateTime ? Selcetdday;
   String formatedday ='';
   TimeOfDay ? chosentime;
   String erorrDate ='';
   String erorrTime ='';
   String FormatedTime='';
+  //late Event event1;
 
   @override
+ void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final arguments = ModalRoute
+          .of(context)
+          ?.settings
+          .arguments;
+      if (arguments != null) {
+        event1 = arguments as Event;
+        setState(() {});
+      }
+    });
+  }
+  @override
   Widget build(BuildContext context) {
-
+    Event event1= ModalRoute.of(context)?.settings.arguments as Event;
     var datalistprovider=Provider.of<DataListProvider>(context);
+
+
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
@@ -53,7 +72,7 @@ DateTime ? Selcetdday;
     List<EventsClass> Eventlist = [
 
 
-    EventsClass(
+      EventsClass(
 
           Title: "this is birthday",
           ImageName: themeProvider.MyAppTheme == ThemeMode.light
@@ -146,7 +165,7 @@ DateTime ? Selcetdday;
               Container(
                   clipBehavior: Clip.antiAlias,
                   decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(16)),
+                  BoxDecoration(borderRadius: BorderRadius.circular(16)),
                   child: Image.asset(Eventlist[SelectedIndex].ImageName)),
               Container(
                 margin: EdgeInsets.symmetric(vertical: height * 0.01),
@@ -159,7 +178,7 @@ DateTime ? Selcetdday;
                         onTap: () {
                           //dataprovider.changeselctedindex(index);
                           setState(() {
-                           SelectedIndex=index;
+                            SelectedIndex=index;
                             SelectedImage=Eventlist[SelectedIndex].ImageName;
                             SelectedName=Eventlist[SelectedIndex].eventName;
 
@@ -177,7 +196,7 @@ DateTime ? Selcetdday;
                             textstyle: SelectedIndex == index
                                 ? AppFontStyles.White16Bold
                                 : AppFontStyles.primarylight14Bold
-                                    .copyWith(fontSize: 16)),
+                                .copyWith(fontSize: 16)),
                       );
                     }),
               ),
@@ -255,8 +274,8 @@ DateTime ? Selcetdday;
                           TextButton(
                               onPressed: onpressedeventdate,
                               child: Text( Chosendate ==null?
-                                AppLocalizations.of(context)!.choosedate:
-                                  formatedday,
+                              AppLocalizations.of(context)!.choosedate:
+                              formatedday,
                                 //"${Chosendate!.day}/${Chosendate!.month}/${Chosendate!.year}",
                                 style: AppFontStyles.primarylight16medium,
                               ))
@@ -284,8 +303,8 @@ DateTime ? Selcetdday;
                           TextButton(
                               onPressed: chosetimeonpressed,
                               child: Text(chosentime==null?
-                                AppLocalizations.of(context)!.choosetime:FormatedTime,
-                              //"${chosentime!.hour}:${chosentime!.minute}",
+                              AppLocalizations.of(context)!.choosetime:FormatedTime,
+                                //"${chosentime!.hour}:${chosentime!.minute}",
 
                                 style: AppFontStyles.primarylight16medium,
                               ))
@@ -330,7 +349,7 @@ DateTime ? Selcetdday;
                         height: height * 0.01,
                       ),
                       CustomeElevatedButtom(
-                        text: AppLocalizations.of(context)!.addevent,
+                        text: AppLocalizations.of(context)!.updateevent,
                         onpressed: addEventOnpressed,
                       )
                     ],
@@ -347,12 +366,17 @@ DateTime ? Selcetdday;
     var userProvide= Provider.of<UserProvider>(context,listen: false);
     if (formKey.currentState?.validate() == true) {
       if (Chosendate != null && chosentime != null) {
-        Event event =Event(Title: enteredtitle.text, Description: enteredDescription.text, Image: SelectedImage, Date: Chosendate, Time: FormatedTime, EventName:SelectedName );
-        FireBaseUtilies.Addeventtofirestore(event,userProvide.currentuser!.Id).then((value){
-          print("the event added successfully");
-          datalistprovider.changeSelectedIndex(0,userProvide.currentuser!.Id);
+        var datalistprovider=Provider.of<DataListProvider>(context,listen: false);
 
-          Fluttertoast.showToast(msg: "the event added successfully",
+        Event event =Event(id:event1.id,Title: enteredtitle.text, Description: enteredDescription.text, Image: SelectedImage, Date: Chosendate, Time: FormatedTime, EventName:SelectedName );
+        datalistprovider.uppdateEvent(event,userProvide.currentuser!.Id);
+        datalistprovider.SelectedIndex == 0 ? datalistprovider.getAllEvents(userProvide.currentuser!.Id) : datalistprovider!.getfilterEvents(userProvide.currentuser!.Id);
+
+        /*.then((value){
+          print("the event added successfully");
+          datalistprovider.SelectedIndex==0?datalistprovider.getAllEvents(userProvide.currentuser!.Id):datalistprovider.getfilterEvents(userProvide.currentuser!.Id);
+
+          Fluttertoast.showToast(msg: "the event updated successfully",
 
               fontSize: 16,
               textColor: AppColors.cleanwhite,
@@ -361,21 +385,7 @@ DateTime ? Selcetdday;
               gravity: ToastGravity.CENTER);
 
         });
-        //
-        //
-        //     .timeout(Duration(milliseconds: 500),onTimeout: () {
-        //   print("the event added successfully");
-        //   datalistprovider.changeSelectedIndex(0);
-        //
-        //   Fluttertoast.showToast(msg: "the event added successfully",
-        //
-        //       fontSize: 16,
-        //       textColor: AppColors.cleanwhite,
-        //       backgroundColor: AppColors.primaryColorLight,
-        //       timeInSecForIosWeb: 1,
-        //       gravity: ToastGravity.CENTER);
-        //
-        // });
+*/
         Navigator.of(context).pop(context);
 
       } else {
@@ -396,25 +406,25 @@ DateTime ? Selcetdday;
         context: context,
         firstDate: DateTime.now(),
         lastDate: DateTime.now().add(Duration(days: 365)));
-     Selcetdday=Chosendate;
+    Selcetdday=Chosendate;
     formatedday=DateFormat.yMd().format(Selcetdday!);
-     setState(() {
+    setState(() {
 
-     });
+    });
 
   }
 
   void chosetimeonpressed() async{
-     chosentime=await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
+    chosentime=await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
 
     );
-     FormatedTime = chosentime!.format(context);
-     
-     setState(() {
+    FormatedTime = chosentime!.format(context);
 
-     });
+    setState(() {
+
+    });
 
   }
 }

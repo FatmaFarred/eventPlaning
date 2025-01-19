@@ -1,7 +1,11 @@
+import 'package:event_planing/Firebase%20utilies/firebase%20utilies.dart';
+import 'package:event_planing/Firebase%20utilies/user%20model%20class.dart';
 import 'package:event_planing/HomePage/HomePage.dart';
+import 'package:event_planing/HomeScreen/CustomAlertDialogue.dart';
 import 'package:event_planing/HomeScreen/Elevatedbottom.dart';
 import 'package:event_planing/HomeScreen/custome_textfield.dart';
 import 'package:event_planing/HomeScreen/homescreen.dart';
+import 'package:event_planing/authentication/Authentication.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/app%20colors.dart';
@@ -111,19 +115,20 @@ class _LoginScreenState extends State<Register> {
                   prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.passwordicon:Assets.passwordicondark),),
                 SizedBox(height: height*0.01,),
 
-                CustomeElevatedButtom(text: AppLocalizations.of(context)!.createAccount),
+                CustomeElevatedButtom( onpressed: registerTap,
+                    text: AppLocalizations.of(context)!.createAccount),
                 SizedBox(height: height*0.02,),
 
                 InkWell(onTap: (){
-                  Navigator.of(context).pushReplacementNamed(Homescreen.routeName);
+
                 },
                   child: Text.rich(TextSpan(
                       children: [
                     TextSpan(
                         text: AppLocalizations.of(context)!.alreadyHaveAccount,style: themeProvider.MyAppTheme==ThemeMode.light?AppFontStyles.balck16medium:AppFontStyles.White16medium),
                     TextSpan(recognizer: TapGestureRecognizer()..onTap=(){
-                      //Navigator.of(context).pushReplacementNamed(Homescreen.routeName);
-                      registerTap();
+                     Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+
                     },
                         text: AppLocalizations.of(context)!.login,style: AppFontStyles.primarylight16BoldItalic.copyWith(decoration: TextDecoration.underline,decorationColor: AppColors.primaryColorLight)),
 
@@ -146,20 +151,42 @@ class _LoginScreenState extends State<Register> {
   }
   void registerTap ()async{
     if (formkey.currentState?.validate()==true){
+      CustomAlertDialogue.showLoading(context: context,message: "Loading.....");
       try {
         final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
+        MyUser myuser= MyUser(Id: credential.user?.uid??"", name: nameController.text, email: emailController.text);
+        await FireBaseUtilies.addUser(myuser);
+        CustomAlertDialogue.hideLoading(context: context);
+        CustomAlertDialogue.showMessage(context: context, message: "Register successfully ");
         print("register successfully ");
         print(credential.user?.uid??"");
-      } on FirebaseAuthException catch (e) {
+       }
+       on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
+          CustomAlertDialogue.hideLoading(context: context);
+          CustomAlertDialogue.showMessage(context: context, message: "The password provided is too weak");
+
           print('The password provided is too weak.');
         } else if (e.code == 'email-already-in-use') {
+          CustomAlertDialogue.hideLoading(context: context);
+          CustomAlertDialogue.showMessage(context: context, message: "The account already exists for that email");
+
           print('The account already exists for that email.');
         }
-      } catch (e) {
+        else if (e.code == 'network-request-failed') {
+          CustomAlertDialogue.hideLoading(context: context);
+          CustomAlertDialogue.showMessage(context: context, message: "A network error (such as timeout, interrupted connection or unreachable host) has occurred.");
+
+          print('The account already exists for that email.');
+        }
+      }
+         catch (e) {
+        CustomAlertDialogue.hideLoading(context: context);
+        CustomAlertDialogue.showMessage(context: context, message: e.toString());
+
         print(e);
       }
 
