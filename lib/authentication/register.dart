@@ -6,6 +6,8 @@ import 'package:event_planing/HomeScreen/Elevatedbottom.dart';
 import 'package:event_planing/HomeScreen/custome_textfield.dart';
 import 'package:event_planing/HomeScreen/homescreen.dart';
 import 'package:event_planing/authentication/Authentication.dart';
+import 'package:event_planing/authentication/ReisterScreenViewModel.dart';
+import 'package:event_planing/authentication/registernavigator.dart';
 import 'package:event_planing/provider/language_provider.dart';
 import 'package:event_planing/provider/theme_provider.dart';
 import 'package:event_planing/utilies/app%20colors.dart';
@@ -23,14 +25,22 @@ static String routeName=" Register screen";
 
   @override
   State<Register> createState() => _LoginScreenState();
+
 }
 
-class _LoginScreenState extends State<Register> {
-    var formkey=GlobalKey<FormState>();
+class _LoginScreenState extends State<Register> implements RegisterNavigator{
+
     var  emailController = TextEditingController(text: "FatmaFarred11@gmail.com");
     var nameController = TextEditingController(text: "Fatma");
     var passwordController = TextEditingController(text: "12345678");
     var repasswordController  = TextEditingController(text:"12345678" );
+    RegisterScreenViewModel registerScreenViewModel =RegisterScreenViewModel ();
+    @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    registerScreenViewModel.registernavigator=this;
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -39,158 +49,139 @@ class _LoginScreenState extends State<Register> {
     var width = MediaQuery.of(context).size.width;
     var languageProvider = Provider.of<MyAppLanguageProvider>(context);
     var themeProvider = Provider.of<MyAppThemeProvier>(context);
-    return Scaffold(resizeToAvoidBottomInset :true,
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.register,style: themeProvider.MyAppTheme==ThemeMode.light?AppFontStyles.primaryDark22Regular:AppFontStyles.primarylight20medium,),centerTitle: true,backgroundColor: Colors.transparent,),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding:  EdgeInsets.symmetric(horizontal: width*0.04),
-          child: Form(key: formkey,
-            child: Column(
-              children: [
-                SizedBox(height: height*0.06,),
-              Image.asset(Assets.eventlylogo),
-              SizedBox(height: height*0.005 ,),
-                CustomeTextfield(controller:nameController ,
-                  validatorFunction: (text){
-                  if (text==null || text.trim().isEmpty){
-                      return "* required please enter name";
-                  }
+    return ChangeNotifierProvider(create: (context)=>registerScreenViewModel,
+      child: Scaffold(resizeToAvoidBottomInset :true,
+        appBar: AppBar(title: Text(AppLocalizations.of(context)!.register,style: themeProvider.MyAppTheme==ThemeMode.light?AppFontStyles.primaryDark22Regular:AppFontStyles.primarylight20medium,),centerTitle: true,backgroundColor: Colors.transparent,),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding:  EdgeInsets.symmetric(horizontal: width*0.04),
+            child: Form(key:registerScreenViewModel. formkey,
+              child: Column(
+                children: [
+                  SizedBox(height: height*0.06,),
+                Image.asset(Assets.eventlylogo),
+                SizedBox(height: height*0.005 ,),
+                  CustomeTextfield(controller:nameController ,
+                    validatorFunction: (text){
+                    if (text==null || text.trim().isEmpty){
+                        return "* required please enter name";
+                    }
 
-                  else {
-                    return null ;
-                  }
+                    else {
+                      return null ;
+                    }
 
-                },
-                  hintText:AppLocalizations.of(context)!.name,prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.nameicon:Assets.nameicondark),),
-                SizedBox(height: height*0.01,),
+                  },
+                    hintText:AppLocalizations.of(context)!.name,prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.nameicon:Assets.nameicondark),),
+                  SizedBox(height: height*0.01,),
 
-              CustomeTextfield(
-                controller:emailController,
-                validatorFunction: (text){
-                if (text==null || text.isEmpty){
-                  return "* required please enter the email";
-                }
-                final bool emailValid =
-                RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                    .hasMatch(text);
-                 if (!emailValid){
-                   return "* please enter valid email ";
-                 }
-
-                  return null ;
-
-              },
-                hintText:AppLocalizations.of(context)!.email,prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.emailicon:Assets.emailicondark),),
-                SizedBox(height: height*0.01,),
-                CustomeTextfield(isobscured: true,
-                  controller: passwordController,
+                CustomeTextfield(
+                  controller:emailController,
                   validatorFunction: (text){
                   if (text==null || text.isEmpty){
-                    return "* required please enter password";
+                    return "* required please enter the email";
                   }
-                  if (text.length<8){
-                    return "* password should be 8 characters at least";
-                  }
+                  final bool emailValid =
+                  RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                      .hasMatch(text);
+                   if (!emailValid){
+                     return "* please enter valid email ";
+                   }
+
                     return null ;
 
                 },
-                  hintText:AppLocalizations.of(context)!.password,sufixIcon:Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.hiddenicon:Assets.hiddenicondark) ,
-                  prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.passwordicon:Assets.passwordicondark),),
+                  hintText:AppLocalizations.of(context)!.email,prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.emailicon:Assets.emailicondark),),
+                  SizedBox(height: height*0.01,),
+                  CustomeTextfield(isobscured: true,
+                    controller: passwordController,
+                    validatorFunction: (text){
+                    if (text==null || text.isEmpty){
+                      return "* required please enter password";
+                    }
+                    if (text.length<8){
+                      return "* password should be 8 characters at least";
+                    }
+                      return null ;
 
-                SizedBox(height: height*0.01,),
-                CustomeTextfield(controller: repasswordController,
-                  validatorFunction: (text){
-                  if (text==null || text.isEmpty){
-                    return "* required please enter repassword";
-                  }
-                  if (text!=passwordController.text){
-                    return "* repassword doesn't match the password";
+                  },
+                    hintText:AppLocalizations.of(context)!.password,sufixIcon:Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.hiddenicon:Assets.hiddenicondark) ,
+                    prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.passwordicon:Assets.passwordicondark),),
 
-                  }
-                    return null ;
+                  SizedBox(height: height*0.01,),
+                  CustomeTextfield(controller: repasswordController,
+                    validatorFunction: (text){
+                    if (text==null || text.isEmpty){
+                      return "* required please enter repassword";
+                    }
+                    if (text!=passwordController.text){
+                      return "* repassword doesn't match the password";
 
-
-                },
-                  hintText:AppLocalizations.of(context)!.repassword,sufixIcon:Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.hiddenicon:Assets.hiddenicondark) ,
-                  prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.passwordicon:Assets.passwordicondark),),
-                SizedBox(height: height*0.01,),
-
-                CustomeElevatedButtom( onpressed: registerTap,
-                    text: AppLocalizations.of(context)!.createAccount),
-                SizedBox(height: height*0.02,),
-
-                InkWell(onTap: (){
-
-                },
-                  child: Text.rich(TextSpan(
-                      children: [
-                    TextSpan(
-                        text: AppLocalizations.of(context)!.alreadyHaveAccount,style: themeProvider.MyAppTheme==ThemeMode.light?AppFontStyles.balck16medium:AppFontStyles.White16medium),
-                    TextSpan(recognizer: TapGestureRecognizer()..onTap=(){
-                     Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
-
-                    },
-                        text: AppLocalizations.of(context)!.login,style: AppFontStyles.primarylight16BoldItalic.copyWith(decoration: TextDecoration.underline,decorationColor: AppColors.primaryColorLight)),
+                    }
+                      return null ;
 
 
+                  },
+                    hintText:AppLocalizations.of(context)!.repassword,sufixIcon:Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.hiddenicon:Assets.hiddenicondark) ,
+                    prefixIcon: Image.asset(themeProvider.MyAppTheme==ThemeMode.light?Assets.passwordicon:Assets.passwordicondark),),
+                  SizedBox(height: height*0.01,),
 
-                  ])),
-                ),
-                SizedBox(height: height*0.02,
-                ),
+                  CustomeElevatedButtom( onpressed: registerTap,
+                      text: AppLocalizations.of(context)!.createAccount),
+                  SizedBox(height: height*0.02,),
 
-                Image.asset(Assets.languageswitch)
+                  InkWell(onTap: (){
 
-              ],),
+                  },
+                    child: Text.rich(TextSpan(
+                        children: [
+                      TextSpan(
+                          text: AppLocalizations.of(context)!.alreadyHaveAccount,style: themeProvider.MyAppTheme==ThemeMode.light?AppFontStyles.balck16medium:AppFontStyles.White16medium),
+                      TextSpan(recognizer: TapGestureRecognizer()..onTap=(){
+                       Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+
+                      },
+                          text: AppLocalizations.of(context)!.login,style: AppFontStyles.primarylight16BoldItalic.copyWith(decoration: TextDecoration.underline,decorationColor: AppColors.primaryColorLight)),
+
+
+
+                    ])),
+                  ),
+                  SizedBox(height: height*0.02,
+                  ),
+
+                  Image.asset(Assets.languageswitch)
+
+                ],),
+            ),
           ),
         ),
+
+
       ),
-
-
     );
   }
   void registerTap ()async{
-    if (formkey.currentState?.validate()==true){
-      CustomAlertDialogue.showLoading(context: context,message: "Loading.....");
-      try {
-        final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
-        );
-        MyUser myuser= MyUser(Id: credential.user?.uid??"", name: nameController.text, email: emailController.text);
-        await FireBaseUtilies.addUser(myuser);
-        CustomAlertDialogue.hideLoading(context: context);
-        CustomAlertDialogue.showMessage(context: context, message: "Register successfully ");
-        print("register successfully ");
-        print(credential.user?.uid??"");
-       }
-       on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          CustomAlertDialogue.hideLoading(context: context);
-          CustomAlertDialogue.showMessage(context: context, message: "The password provided is too weak");
 
-          print('The password provided is too weak.');
-        } else if (e.code == 'email-already-in-use') {
-          CustomAlertDialogue.hideLoading(context: context);
-          CustomAlertDialogue.showMessage(context: context, message: "The account already exists for that email");
-
-          print('The account already exists for that email.');
-        }
-        else if (e.code == 'network-request-failed') {
-          CustomAlertDialogue.hideLoading(context: context);
-          CustomAlertDialogue.showMessage(context: context, message: "A network error (such as timeout, interrupted connection or unreachable host) has occurred.");
-
-          print('The account already exists for that email.');
-        }
-      }
-         catch (e) {
-        CustomAlertDialogue.hideLoading(context: context);
-        CustomAlertDialogue.showMessage(context: context, message: e.toString());
-
-        print(e);
-      }
-
+    registerScreenViewModel.registerTap(emailController.text, passwordController.text, nameController.text);
     }
+
+  @override
+  void hideLoading() {
+    Navigator.of(context).pop();
   }
+
+  @override
+  void showLoading(String message) {
+    CustomAlertDialogue.showLoading(context: context ,message:message );
+  }
+
+  @override
+  void showMessage(String message) {
+    CustomAlertDialogue.showMessage(context: context,message: message);
+  }
+  }
+
+
   
-}
+

@@ -5,6 +5,7 @@ import 'package:event_planing/HomeScreen/CustomAlertDialogue.dart';
 import 'package:event_planing/HomeScreen/Elevatedbottom.dart';
 import 'package:event_planing/HomeScreen/custome_textfield.dart';
 import 'package:event_planing/HomeScreen/homescreen.dart';
+import 'package:event_planing/authentication/Loginscreen%20viewmodel.dart';
 import 'package:event_planing/authentication/forget%20password.dart';
 import 'package:event_planing/authentication/register.dart';
 import 'package:event_planing/provider/UserProvider.dart';
@@ -21,6 +22,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'loginnavigator.dart';
+
 
 class LoginScreen extends StatefulWidget {
 static String routeName=" login screen";
@@ -29,10 +32,16 @@ static String routeName=" login screen";
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-var formkey=GlobalKey<FormState>();
-var  emailController = TextEditingController(text: "FatmaFarred11@gmail.com");
-var passwordController = TextEditingController(text: "12345678");
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> implements LoginNavigator{
+
+  LoginScreenViewModel loginScreenViewModel=LoginScreenViewModel ();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    loginScreenViewModel.loginNavigator=this;
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery
@@ -49,13 +58,13 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: width * 0.04),
-          child: Form(key: formkey,
+          child: Form(key: loginScreenViewModel.formkey,
             child: Column(
               children: [
                 SizedBox(height: height * 0.06,),
                 Image.asset(Assets.eventlylogo),
                 SizedBox(height: height * 0.005,),
-                CustomeTextfield(controller: emailController,
+                CustomeTextfield(controller: loginScreenViewModel.emailController,
                   validatorFunction: (text) {
                     if (text == null || text.isEmpty) {
                       return "* required please enter the email";
@@ -76,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       themeProvider.MyAppTheme == ThemeMode.light ? Assets
                           .emailicon : Assets.emailicondark),),
                 SizedBox(height: height * 0.01,),
-                CustomeTextfield(controller: passwordController,
+                CustomeTextfield(controller: loginScreenViewModel.passwordController,
                   validatorFunction: (text) {
                     if (text == null || text.isEmpty) {
                       return "* required please enter password";
@@ -167,134 +176,29 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void logedinTap() async {
-    if (formkey.currentState?.validate() == true) {
-      CustomAlertDialogue.showLoading(context: context,message: "Loading.....");
+    loginScreenViewModel.logedinTap(context);
 
-      try {
-        final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-            email: emailController.text,
-            password: passwordController.text
-        );
-       var myuser= await FireBaseUtilies.readUserFromFireStore(credential.user?.uid??"");
-       if (myuser==null){
-         return;
-       }
-        var datalistprovider = Provider.of<DataListProvider>(context,listen: false);
-
-        var userProvide= Provider.of<UserProvider>(context,listen: false);
-        userProvide.changeUser(myuser);
-        CustomAlertDialogue.hideLoading(context: context);
-        CustomAlertDialogue.showMessage(context: context, message: "Login successfully ");
-        datalistprovider.getAllEvents(userProvide.currentuser!.Id);
-        Navigator.of(context).pushReplacementNamed(Homescreen.routeName);
-        print("register successfully ");
-        print(credential.user?.uid??"");
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'user-not-found') {
-          print('No user found for that email.');
-        } else if (e.code == 'wrong-password') {
-          print('Wrong password provided for that user.');
-        }else if (e.code == 'invalid-credential') {
-          CustomAlertDialogue.hideLoading(context: context);
-          CustomAlertDialogue.showMessage(context: context, message:'The supplied auth credential is incorrect,malformed or has expired');
-
-          print('The supplied auth credential is incorrect,malformed or has expired');
-        }
-        else if (e.code == 'network-request-failed') {
-          CustomAlertDialogue.hideLoading(context: context);
-          CustomAlertDialogue.showMessage(context: context, message: "A network error (such as timeout, interrupted connection or unreachable host) has occurred.");
-
-          print('The account already exists for that email.');
-        }
-      }catch (e) {
-    CustomAlertDialogue.hideLoading(context: context);
-    CustomAlertDialogue.showMessage(context: context, message: e.toString());
-
-    print(e);
-    }
-
-  }
 }
+
   Future<void> signInWithGoogle() async {
-    CustomAlertDialogue.showLoading(context: context, message: "Loading...");
-
-    try {
-      // Trigger the authentication flow
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        // If Google sign-in is canceled
-        CustomAlertDialogue.hideLoading(context: context);
-        CustomAlertDialogue.showMessage(
-            context: context,
-            message: "Google Sign-In was canceled.");
-        return;
-      }
-
-      // Obtain the authentication details from the Google sign-in
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      // Create a new credential using the access and ID token
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // Sign in with Firebase using the created credentials
-        UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-      String? uid = userCredential.user?.uid;
-      print("Signed in UID: $uid");
-      MyUser? myUser = MyUser(Id: uid ?? "", name: userCredential.user?.displayName ?? "", email: userCredential.user?.email??"");
-
-      if (userCredential.additionalUserInfo!.isNewUser){
-        await FireBaseUtilies.addUser(myUser);
-
-      }
-      // Check the user credential and UID
+    loginScreenViewModel.signInWithGoogle(context);
+  }
 
 
 
-      // Now fetch the user from Firestore using the UID
-       myUser = await FireBaseUtilies.readUserFromFireStore(uid ?? "");
+  @override
+  void hideLoading() {
+    Navigator.of(context).pop();
+  }
 
-      // Debugging: Check if the user exists in Firestore
-      if (myUser == null) {
-        print("User not found in Firestore, creating a new one...");
+  @override
+  void showLoading(String message) {
+    CustomAlertDialogue.showLoading(context: context ,message:message );
+  }
 
-      }
-
-      // Check if the user is null even after creating
-      if (myUser == null) {
-        CustomAlertDialogue.hideLoading(context: context);
-        CustomAlertDialogue.showMessage(
-            context: context,
-            message: "Failed to fetch or create user.");
-        return;
-      }
-
-      // Update the user provider with the user data
-      var userProvider = Provider.of<UserProvider>(context, listen: false);
-      userProvider.changeUser(myUser);
-
-      // Fetch data and navigate to the homescreen
-      var dataListProvider = Provider.of<DataListProvider>(context, listen: false);
-      dataListProvider.getAllEvents(userProvider.currentuser!.Id);
-
-      // Hide the loading indicator and show a success message
-      CustomAlertDialogue.hideLoading(context: context);
-      CustomAlertDialogue.showMessage(
-          context: context,
-          message: "Login successful");
-
-      // Navigate to the homescreen
-      Navigator.of(context).pushReplacementNamed(Homescreen.routeName);
-
-    } catch (e) {
-      // Handle any errors that occur during sign-in
-      CustomAlertDialogue.hideLoading(context: context);
-      CustomAlertDialogue.showMessage(context: context, message: e.toString());
-      print("Error during Google Sign-In: $e");
-      return Future.error(e);
-    }
+  @override
+  void showMessage(String message) {
+    CustomAlertDialogue.showMessage(context: context,message: message);
   }
 
 
